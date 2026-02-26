@@ -1,0 +1,5 @@
+streamlit>=1.40.0
+requests>=2.32.0
+matplotlib>=3.8.0
+matplotlib-venn>=1.1.0
+pandas>=2.2.0
