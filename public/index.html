@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Compare two Last.fm users and discover the artists they share.">
+    <meta name="theme-color" content="#f8f2ea">
+    <meta property="og:title" content="Last.fm Artist Overlap Explorer">
+    <meta property="og:description" content="Compare two Last.fm users and discover their musical overlap.">
+    <meta property="og:type" content="website">
+    <title>Last.fm Artist Overlap Explorer</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <h1>Last.fm Artist Overlap Explorer</h1>
+        <p class="lede">Compare two Last.fm users and visualize shared artists across timeframes. The results have a little personality.</p>
+      </header>
+
+      <section class="panel compare-panel" aria-labelledby="compare-heading">
+        <h2 id="compare-heading" class="sr-only">Choose users and timeframes</h2>
+        <form id="compare-form">
+          <div class="user-grid">
+            <label>
+              <span>Username #1</span>
+              <input id="user-a" name="a" type="text" maxlength="64" autocomplete="off" placeholder="e.g. alice" required>
+            </label>
+            <div class="versus" aria-hidden="true">&amp;</div>
+            <label>
+              <span>Username #2</span>
+              <input id="user-b" name="b" type="text" maxlength="64" autocomplete="off" placeholder="e.g. bob" required>
+            </label>
+          </div>
+
+          <fieldset>
+            <legend>Timeframes</legend>
+            <div class="periods">
+              <label><input type="checkbox" name="period" value="7day" checked><span>7 days</span></label>
+              <label><input type="checkbox" name="period" value="1month" checked><span>1 month</span></label>
+              <label><input type="checkbox" name="period" value="3month"><span>3 months</span></label>
+              <label><input type="checkbox" name="period" value="6month"><span>6 months</span></label>
+              <label><input type="checkbox" name="period" value="12month"><span>12 months</span></label>
+              <label><input type="checkbox" name="period" value="overall" checked><span>Overall</span></label>
+            </div>
+          </fieldset>
+
+          <button class="primary" type="submit">Find the overlap <span aria-hidden="true">→</span></button>
+        </form>
+        <p id="status" class="status" role="status" aria-live="polite">Enter two public Last.fm usernames to begin.</p>
+      </section>
+
+      <section id="fingerprint" class="fingerprint" hidden aria-labelledby="fingerprint-label">
+        <div>
+          <p class="eyebrow">Overlap Fingerprint · <span id="fingerprint-period"></span></p>
+          <h2 id="fingerprint-label"></h2>
+          <p id="fingerprint-summary" class="fingerprint-summary"></p>
+        </div>
+        <dl>
+          <div><dt>Strongest signal</dt><dd id="fingerprint-strongest"></dd></div>
+          <div><dt>Deep cut</dt><dd id="fingerprint-deep-cut"></dd></div>
+        </dl>
+        <button id="share" class="secondary" type="button">Copy share link</button>
+      </section>
+
+      <section id="results" class="results" aria-label="Comparison results"></section>
+
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>
+          Built and maintained by
+          <a href="https://nathanhenderson.ca" target="_blank" rel="noopener noreferrer">Nathan Henderson</a>
+          · Open-source project using Last.fm data
+        </span>
+        <span>
+          <a href="https://github.com/HendersonViz/lastfm_venn" target="_blank" rel="noopener noreferrer">Source on GitHub</a>
+          · Independent project, not affiliated with Last.fm.
+        </span>
+      </div>
+    </footer>
+
+    <template id="result-template">
+      <article class="result-card panel">
+        <header class="result-header">
+          <div><p class="eyebrow">Artist overlap</p><h2 class="period-title"></h2></div>
+          <button class="download secondary" type="button">Download CSV</button>
+        </header>
+        <div class="metrics"></div>
+        <div class="result-grid">
+          <div class="venn-wrap"></div>
+          <div class="table-wrap">
+            <h3>Top shared artists</h3>
+            <p class="table-note">Ranked by a balance-aware match score.</p>
+            <div class="scroll-table">
+              <table>
+                <thead><tr><th>Artist</th><th><span class="match-heading">Match <button class="methodology-help" type="button" aria-label="How the match score is calculated" data-tooltip="Uses both users' play counts and rewards a balanced match.">?</button></span></th><th class="plays-a"></th><th class="plays-b"></th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </article>
+    </template>
+  </body>
+</html>

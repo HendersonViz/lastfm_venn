@@ -1,59 +1,29 @@
 # AGENTS.md
 
 ## Purpose
-This repository contains a Streamlit app that compares two Last.fm usernames and visualizes overlapping top artists with Venn diagrams across selected timeframes.
+This repository contains a dependency-light Cloudflare Worker and static web app that compares the top artists of two Last.fm users.
 
 ## Stack
-- Python 3
-- Streamlit
-- requests
-- matplotlib
-- matplotlib-venn
-- pandas
-
-## Quick Start
-1. Create a virtual environment and activate it.
-2. Install dependencies:
-   - `pip install -r requirements.txt`
-3. Provide a Last.fm API key:
-   - set env var: `export LASTFM_API_KEY="your_key"`
-   - or enter key in the sidebar at runtime
-4. Run app:
-   - `streamlit run app.py`
+- JavaScript ES modules
+- Cloudflare Workers + Workers Static Assets
+- Wrangler 4
+- Node's built-in test runner
 
 ## Project Map
-- `app.py`
-  - Streamlit UI
-  - input handling (users, periods, API key)
-  - display metrics, charts, overlap table, CSV export
-- `lastfm_venn/client.py`
-  - Last.fm API client (`user.gettopartists`)
-  - pagination, response parsing, error normalization
-- `lastfm_venn/analysis.py`
-  - overlap computation and shared-artist ranking
-- `lastfm_venn/visualization.py`
-  - styled 2-set Venn chart rendering
+- `worker/index.js`: HTTP routing, response normalization, asset fallback, security headers
+- `worker/lastfm.js`: Last.fm client, validation, pagination, timeouts, error mapping, edge caching
+- `src/overlap.js`: pure overlap and fingerprint calculations shared with tests
+- `public/`: framework-free browser UI
+- `tests/`: focused calculation and API tests
+- `wrangler.jsonc`: one-Worker deployment configuration
 
 ## Development Guidelines
-- Keep logic modular:
-  - API/network code in `client.py`
-  - data transforms in `analysis.py`
-  - plotting in `visualization.py`
-  - UI orchestration in `app.py`
-- Preserve existing timeframe mapping unless intentionally changing product behavior.
-- Handle Last.fm/API failures with user-facing errors, not crashes.
-- Prefer explicit types and simple pure functions for analysis logic.
+- Keep `LASTFM_API_KEY` only in `.dev.vars` locally and in a Worker secret in production.
+- Keep API/network behavior in `worker/` and calculations pure in `src/`.
+- Preserve the six Last.fm timeframe identifiers and harmonic-mean match score unless intentionally changing product behavior.
+- Do not add KV, authentication, a database, or a frontend framework without a concrete need.
+- Return stable, user-safe API errors; do not return upstream URLs, keys, stack traces, or raw exceptions.
 
 ## Validation
-Run at least:
-- `python3 -m compileall app.py lastfm_venn`
-
-Manual smoke test:
-1. Launch app.
-2. Enter API key + two valid usernames.
-3. Select multiple periods.
-4. Confirm Venn chart, metrics, table, and CSV download render per period.
-
-## Notes
-- No formal automated test suite is set up yet.
+Run `npm run check` before deployment. For a manual smoke test, run `npm run dev`, compare two valid public usernames, inspect multiple periods, download a CSV, copy/reload the share URL, and test an invalid username.
 - Use `python3` explicitly in this environment.

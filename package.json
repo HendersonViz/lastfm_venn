@@ -1,0 +1,22 @@
+{
+  "name": "lastfm-artist-overlap",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Compare the top artists of two Last.fm users.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "wrangler deploy --dry-run --outdir dist",
+    "test": "node --test",
+    "check:syntax": "node --check public/app.js && node --check src/overlap.js && node --check worker/lastfm.js && node --check worker/index.js",
+    "check": "npm test && npm run check:syntax && npm run build",
+    "deploy": "npm run check && wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "wrangler": "4.131.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
