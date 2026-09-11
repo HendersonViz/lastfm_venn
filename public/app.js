@@ -85,16 +85,24 @@ function vennDiagram(data) {
 function metric(label, value, note) {
   const item = document.createElement("div");
   item.className = "metric";
-  const labelElement = textElement("span", label, "metric-label");
+  const labelElement = textElement("span", "", "metric-label");
+  labelElement.append(textElement("span", label, "metric-label-text"));
   if (note) {
     const help = textElement("button", "?", "methodology-help");
     help.type = "button";
     help.setAttribute("aria-label", "How the match score is calculated");
+    help.setAttribute("aria-expanded", "false");
     help.dataset.tooltip = note;
     labelElement.append(help);
   }
   item.append(labelElement, textElement("strong", value));
   return item;
+}
+
+function closeMethodologyHelp(except) {
+  document.querySelectorAll('.methodology-help[aria-expanded="true"]').forEach((help) => {
+    if (help !== except) help.setAttribute("aria-expanded", "false");
+  });
 }
 
 function scoreToVibe(score) {
@@ -241,6 +249,23 @@ document.querySelector("#share").addEventListener("click", async (event) => {
   } catch {
     setStatus("Copy the current address from your browser to share this result.");
   }
+});
+
+document.addEventListener("click", (event) => {
+  const help = event.target.closest(".methodology-help");
+  if (!help) return closeMethodologyHelp();
+
+  const willOpen = help.getAttribute("aria-expanded") !== "true";
+  closeMethodologyHelp(help);
+  help.setAttribute("aria-expanded", String(willOpen));
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+  const help = document.querySelector('.methodology-help[aria-expanded="true"]');
+  if (!help) return;
+  help.setAttribute("aria-expanded", "false");
+  help.focus();
 });
 
 const initial = new URLSearchParams(location.search);
