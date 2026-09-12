@@ -165,19 +165,6 @@ Last.fm user/period responses are held in Cloudflare's local data-centre Cache A
 - The edge cache temporarily stores public artist lists keyed by Last.fm username for request reduction. It is regional and expires after 30 minutes.
 - Share URLs expose the two usernames in browser history and to anyone receiving the link. Listening data is not encoded in the URL.
 
-## Phase 3 assessment (deliberately deferred)
-
-The current architecture is intentionally enough for modest traffic:
-
-- **Caching:** Static Assets already receive normal Cloudflare asset caching. The Cache API handles the generated Last.fm data that normal static caching cannot. Thirty-minute per-user/per-period caching removes common repeats without a durable data store.
-- **KV:** Not warranted now. KV becomes useful only if cross-region cache misses create measurable Last.fm rate-limit pressure, if longer-lived reusable results are needed, or if purge/control requirements exceed ephemeral edge caching. `fetchTopArtists` is isolated so a cache adapter can be changed later.
-- **Abuse protection:** Input bounds, fixed periods, bounded pagination, same-origin browser access, and upstream caching limit accidental load. If public abuse appears, add a Cloudflare Rate Limiting rule for `/api/lastfm/*` before adding application state. Browser same-origin rules are not an authentication boundary, so the endpoint remains publicly callable.
-- **Observability:** Workers Logs is enabled and only structured error code/status data is logged. Review volume after launch and lower `head_sampling_rate` if traffic grows. No third-party logging service is justified yet.
-- **Dependencies:** Wrangler is the only dependency and is pinned. Review it periodically with `npm outdated`; avoid automated major upgrades without a smoke test.
-- **Accessibility:** The implementation includes labels, keyboard-focus states, live status, table headings, reduced-motion handling, and an accessible description for each Venn. A manual screen-reader and colour-contrast review remains worthwhile.
-- **SEO/metadata:** Basic title, description, Open Graph metadata, semantic headings, and a stable custom domain are included. A bespoke social preview image, canonical tag after the domain is live, and search-console submission can wait.
-- **Shareable results:** Query-string restoration is implemented. Server-rendered per-comparison social cards are deliberately not included; they would add complexity and expose usernames to crawlers/cache layers.
-
 ## License
 
 [MIT](./LICENSE) © 2026 Nathan Henderson. This project is not affiliated with Last.fm.
